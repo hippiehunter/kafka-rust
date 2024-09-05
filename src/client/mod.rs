@@ -18,7 +18,7 @@ pub use crate::compression::Compression;
 pub use crate::utils::PartitionOffset;
 
 #[cfg(feature = "security")]
-pub use self::network::SecurityConfig;
+use rustls::ClientConfig as TlsClientConfig;
 
 use crate::codecs::{FromByte, ToByte};
 use crate::error::{Error, KafkaCode, Result};
@@ -415,31 +415,15 @@ impl KafkaClient {
     /// # Examples
     ///
     /// ```no_run
-    /// extern crate openssl;
+    /// extern crate rustls;
     /// extern crate kafka;
     ///
-    /// use openssl::ssl::{SslConnector, SslMethod, SslFiletype, SslVerifyMode};
-    /// use kafka::client::{KafkaClient, SecurityConfig};
+    /// use rustls::ClientConfig;
+    /// use kafka::client::KafkaClient;
     ///
     /// fn main() {
-    ///     let (key, cert) = ("client.key".to_string(), "client.crt".to_string());
-    ///
-    ///     // OpenSSL offers a variety of complex configurations. Here is an example:
-    ///     let mut builder = SslConnector::builder(SslMethod::tls()).unwrap();
-    ///     builder.set_cipher_list("DEFAULT").unwrap();
-    ///     builder
-    ///         .set_certificate_file(cert, SslFiletype::PEM)
-    ///         .unwrap();
-    ///     builder
-    ///         .set_private_key_file(key, SslFiletype::PEM)
-    ///         .unwrap();
-    ///     builder.check_private_key().unwrap();
-    ///     builder.set_default_verify_paths().unwrap();
-    ///     builder.set_verify(SslVerifyMode::PEER);
-    ///     let connector = builder.build();
-    ///
     ///     let mut client = KafkaClient::new_secure(vec!("localhost:9092".to_owned()),
-    ///                                              SecurityConfig::new(connector));
+    ///                                              ClientConfig::new());
     ///     client.load_metadata_all().unwrap();
     /// }
     /// ```
@@ -452,7 +436,7 @@ impl KafkaClient {
     /// as well as
     /// [Kafka's documentation](https://kafka.apache.org/documentation.html#security_ssl).
     #[cfg(feature = "security")]
-    pub fn new_secure(hosts: Vec<String>, security: SecurityConfig) -> KafkaClient {
+    pub fn new_secure(hosts: Vec<String>, security: TlsClientConfig) -> KafkaClient {
         KafkaClient {
             config: ClientConfig {
                 client_id: String::new(),

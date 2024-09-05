@@ -69,10 +69,10 @@ use std::time::Duration;
 use twox_hash::XxHash32;
 
 #[cfg(feature = "security")]
-use crate::client::SecurityConfig;
+use rustls::ClientConfig;
 
 #[cfg(not(feature = "security"))]
-type SecurityConfig = ();
+type ClientConfig = ();
 use crate::client_internals::KafkaClientInternals;
 use crate::protocol;
 
@@ -353,7 +353,7 @@ pub struct Builder<P = DefaultPartitioner> {
     conn_idle_timeout: Duration,
     required_acks: RequiredAcks,
     partitioner: P,
-    security_config: Option<SecurityConfig>,
+    security_config: Option<ClientConfig>,
     client_id: Option<String>,
 }
 
@@ -382,7 +382,7 @@ impl Builder {
     /// Specifies the security config to use.
     /// See `KafkaClient::new_secure` for more info.
     #[cfg(feature = "security")]
-    pub fn with_security(mut self, security: SecurityConfig) -> Self {
+    pub fn with_security(mut self, security: ClientConfig) -> Self {
         self.security_config = Some(security);
         self
     }
@@ -446,12 +446,12 @@ impl<P> Builder<P> {
     }
 
     #[cfg(not(feature = "security"))]
-    fn new_kafka_client(hosts: Vec<String>, _: Option<SecurityConfig>) -> KafkaClient {
+    fn new_kafka_client(hosts: Vec<String>, _: Option<ClientConfig>) -> KafkaClient {
         KafkaClient::new(hosts)
     }
 
     #[cfg(feature = "security")]
-    fn new_kafka_client(hosts: Vec<String>, security: Option<SecurityConfig>) -> KafkaClient {
+    fn new_kafka_client(hosts: Vec<String>, security: Option<ClientConfig>) -> KafkaClient {
         if let Some(security) = security {
             KafkaClient::new_secure(hosts, security)
         } else {
