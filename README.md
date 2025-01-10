@@ -1,7 +1,5 @@
 # Kafka Rust Client
 
-[![Build Status](https://travis-ci.org/spicavigo/kafka-rust.svg?branch=master)](https://travis-ci.org/spicavigo/kafka-rust) [![](http://meritbadge.herokuapp.com/kafka)](https://crates.io/crates/kafka)
-
 ## Project Status
 
 This project is starting to be maintained by John Ward, the current status is that I am bringing the project up to date with the latest dependencies, removing deprecated Rust code and adjusting the tests.
@@ -24,7 +22,7 @@ expect the version number to grow quickly).
 
 ```toml
 [dependencies]
-kafka = "0.9"
+kafka = "0.10"
 ```
 
 To build kafka-rust the usual `cargo build` should suffice. The crate
@@ -107,6 +105,12 @@ distribution):
 
 ```
 kafka-topics.sh --topic my-topic --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1
+```
+
+Zookeeper will be removed in the next major kafka release. Using `--bootstrap-server` to be more ready.
+
+```
+kafka-topics.sh --topic my-topic --create --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 ```
 
 See also [Kafka's quickstart guide](https://kafka.apache.org/documentation.html#quickstart)

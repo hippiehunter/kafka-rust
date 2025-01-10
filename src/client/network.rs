@@ -294,7 +294,7 @@ impl KafkaConnection {
     }
 
     pub fn read_exact(&mut self, buf: &mut [u8]) -> Result<()> {
-        let r = (&mut self.stream).read_exact(buf).map_err(From::from);
+        let r = (self.stream).read_exact(buf).map_err(From::from);
         trace!("Read {} bytes from: {:?} => {:?}", buf.len(), self, r);
         r
     }
